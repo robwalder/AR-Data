@@ -71,7 +71,7 @@ Function ApplyFuncsToForceWaves(FunctionInputList,[FPList,OutputWaveNameList,Des
 	// Initialize Output Waves
 	For(Counter=0;Counter<NumFunctions;Counter+=1)
 		Variable NumColumns = str2num(StringFromList(Counter,NumOutputs,";"))
-		Make/O/N=(nop,NumColumns) $StringFromList(Counter,OutputWaveNameList,";")
+		Make/D/O/N=(nop,NumColumns) $StringFromList(Counter,OutputWaveNameList,";")
 	EndFor
 
 	// This is our master loop.  It will iterate through our list of Force Ramps and apply our functions
@@ -386,8 +386,21 @@ Function GetAbsoluteTimeAR(ForceWave)
 	String DateString=GetForceRampSetting(ForceWave,"Date")
 	String TimeString=GetForceRampSetting(ForceWave,"Time")
 	Return ParseDateTime(DateString,TimeString,DateFormat="yyyy-mm-dd")
-	
 End
+
+Function ARStartRampTime(Force_Ret)
+	Wave Force_Ret
+	Variable NumPts=DimSize(Force_Ret,0)
+	Variable TimeForRamp=pnt2x(Force_Ret, NumPts-1 )
+	Return AREndRampTime(Force_Ret)-TimeForRamp
+
+End
+
+Function AREndRampTime(Force_Ret)
+	Wave Force_Ret
+	Return GetAbsoluteTimeAR(Force_Ret)
+End
+
 
 Function GetPullingVelocity(ForceWave)
 	Wave ForceWave
