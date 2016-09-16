@@ -516,30 +516,30 @@ Function/S UniqueForceLists()
 	
 End // UniqueForceLists
 
-
-Window ApplyFuncToFRPanel() : Panel
-	PauseUpdate; Silent 1		// building window...
-	NewPanel /W=(1290,183,1636,685) as "Apply Functions to Force Ramps"
-	ListBox FunctionsList_ListBox,pos={8,6},size={332,284},proc=FRUListBoxProc
-	ListBox FunctionsList_ListBox,listWave=root:MyForceData:CurrentFunctionsList
-	ListBox FunctionsList_ListBox,selWave=root:MyForceData:CurrentFunctionsListSel
-	ListBox FunctionsList_ListBox,mode= 2,selRow= 4
-	SetVariable NameOfFunction_SV,pos={8,330},size={322,16},proc=FRUSetVarProc,title="Function Name"
-	SetVariable NameOfFunction_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%FunctionName]
-	SetVariable FunctionToApply_SV,pos={8,352},size={320,16},proc=FRUSetVarProc,title="Function"
-	SetVariable FunctionToApply_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%FunctionString]
-	SetVariable OutputWaveName_SV,pos={8,375},size={320,16},proc=FRUSetVarProc,title="Output Wave Name"
-	SetVariable OutputWaveName_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%OutputWaveName]
-	Button AddToFunctionsList_Button,pos={8,299},size={87,27},proc=FRUButtonProc,title="Add Function"
-	Button AddToFunctionsList_Button,fColor=(61440,61440,61440)
-	Button RemoveFromFunctionsList_Button,pos={105,299},size={95,27},proc=FRUButtonProc,title="Remove Function"
-	Button RemoveFromFunctionsList_Button,fColor=(61440,61440,61440)
-	SetVariable NumOutputs_SV,pos={8,397},size={320,16},proc=FRUSetVarProc,title="Number Of Outputs"
-	SetVariable NumOutputs_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%NumberOfOutputs]
-	Button ApplyAllFuncsToFRList_Button,pos={137,462},size={122,30},proc=FRUButtonProc,title="Apply All Functions"
-	Button ApplyAllFuncsToFRList_Button,fColor=(61440,61440,61440)
-	Button ApplyOneFuncToFRList_Button,pos={8,463},size={122,30},proc=FRUButtonProc,title="Apply This Function"
-	Button ApplyOneFuncToFRList_Button,fColor=(61440,61440,61440)
-	PopupMenu FunctionPresets_Popup,pos={8,424},size={154,22},proc=FRUPopMenuProc,title="Function Presets"
-	PopupMenu FunctionPresets_Popup,mode=1,popvalue="WLC Fit",value= #"\"WLC Fit;Load Corrected FR;CL Analysis;Find And Save Detrend;Apply Detrend Function;Update Offset Stats;Update Rupture Stats;Box Car Filter;Rupture Force Stats;Offset Stats;Custom\""
-EndMacro
+//
+//Window ApplyFuncToFRPanel() : Panel
+//	PauseUpdate; Silent 1		// building window...
+//	NewPanel /W=(1290,183,1636,685) as "Apply Functions to Force Ramps"
+//	ListBox FunctionsList_ListBox,pos={8,6},size={332,284},proc=FRUListBoxProc
+//	ListBox FunctionsList_ListBox,listWave=root:MyForceData:CurrentFunctionsList
+//	ListBox FunctionsList_ListBox,selWave=root:MyForceData:CurrentFunctionsListSel
+//	ListBox FunctionsList_ListBox,mode= 2,selRow= 4
+//	SetVariable NameOfFunction_SV,pos={8,330},size={322,16},proc=FRUSetVarProc,title="Function Name"
+//	SetVariable NameOfFunction_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%FunctionName]
+//	SetVariable FunctionToApply_SV,pos={8,352},size={320,16},proc=FRUSetVarProc,title="Function"
+//	SetVariable FunctionToApply_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%FunctionString]
+//	SetVariable OutputWaveName_SV,pos={8,375},size={320,16},proc=FRUSetVarProc,title="Output Wave Name"
+//	SetVariable OutputWaveName_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%OutputWaveName]
+//	Button AddToFunctionsList_Button,pos={8,299},size={87,27},proc=FRUButtonProc,title="Add Function"
+//	Button AddToFunctionsList_Button,fColor=(61440,61440,61440)
+//	Button RemoveFromFunctionsList_Button,pos={105,299},size={95,27},proc=FRUButtonProc,title="Remove Function"
+//	Button RemoveFromFunctionsList_Button,fColor=(61440,61440,61440)
+//	SetVariable NumOutputs_SV,pos={8,397},size={320,16},proc=FRUSetVarProc,title="Number Of Outputs"
+//	SetVariable NumOutputs_SV,limits={-inf,inf,0},value= root:MyForceData:CurrentFunctions[0][%NumberOfOutputs]
+//	Button ApplyAllFuncsToFRList_Button,pos={137,462},size={122,30},proc=FRUButtonProc,title="Apply All Functions"
+//	Button ApplyAllFuncsToFRList_Button,fColor=(61440,61440,61440)
+//	Button ApplyOneFuncToFRList_Button,pos={8,463},size={122,30},proc=FRUButtonProc,title="Apply This Function"
+//	Button ApplyOneFuncToFRList_Button,fColor=(61440,61440,61440)
+//	PopupMenu FunctionPresets_Popup,pos={8,424},size={154,22},proc=FRUPopMenuProc,title="Function Presets"
+//	PopupMenu FunctionPresets_Popup,mode=1,popvalue="WLC Fit",value= #"\"WLC Fit;Load Corrected FR;CL Analysis;Find And Save Detrend;Apply Detrend Function;Update Offset Stats;Update Rupture Stats;Box Car Filter;Rupture Force Stats;Offset Stats;Custom\""
+//EndMacro
