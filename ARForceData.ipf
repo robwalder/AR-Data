@@ -1,5 +1,6 @@
 #pragma rtGlobals=3		// Use modern global access method and strict wave access.
 #pragma version=1.1
+#include "::General-Igor-Utilities:ParseDateTime"
 
 // Adapting for FRU version 1.4
 // I now remove outputwaves with no data when you use applyfuncstoforcewaves with numoutputs=0
@@ -378,6 +379,14 @@ Function GetFractionalTime(ForceWave,[TimeMode,DateMode])
 
 	
 	Return OutputTime
+End
+
+Function GetAbsoluteTimeAR(ForceWave)
+	Wave ForceWave
+	String DateString=GetForceRampSetting(ForceWave,"Date")
+	String TimeString=GetForceRampSetting(ForceWave,"Time")
+	Return ParseDateTime(DateString,TimeString,DateFormat="yyyy-mm-dd")
+	
 End
 
 Function GetPullingVelocity(ForceWave)
