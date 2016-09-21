@@ -13,15 +13,15 @@ Function InitTimeLine()
 	Wave ARTime
 	Wave/T ARName
 	
-	Concatenate/O/NP {RNAPullingTime,ARTime}, MasterTime
-	Concatenate/O/NP {RNAPullingName,ARName}, MasterNames
+	Concatenate/DL/O/NP {RNAPullingTime,ARTime}, MasterTime
+	Concatenate/DL/O/NP {RNAPullingName,ARName}, MasterNames
 	Duplicate/O RNAPullingTime, RNAPullingState
 	Duplicate/O ARTime, ARState
 	ARState=0
 	RNAPullingState=0
-	Concatenate/O/NP {RNAPullingState,ARState}, MasterState
-	Sort MasterTime,MasterTime,MasterNames,MasterState
-	
+	Concatenate/DL/O/NP {RNAPullingState,ARState}, MasterState
+	Sort/DIML MasterTime,MasterTime,MasterNames,MasterState
+	GetCenteredFRTimeline()
 End
 
 Function DisplayTimeline()
@@ -54,9 +54,36 @@ Function GetForceRampTimeline()
 		ARName[RampCounter]=GetDimLabel(ARStartTime, 0, RampCounter )
 		ARTime[RampCounter]=(ARStartTime[RampCounter]+AREndTime[RampCounter])/2
 		ARErrorBar[RampCounter]=(AREndTime[RampCounter]-ARStartTime[RampCounter])/2
+		SetDimLabel 0,RampCounter,$ARName[RampCounter],ARName,ARTime,ARErrorBar
 		
 	EndFor
-	Sort AREndTime,AREndTime,ARTime,ARStartTime,ARName,ARErrorBar
+	Sort/DIML AREndTime,AREndTime,ARTime,ARStartTime,ARName,ARErrorBar
+End
+
+Function GetCenteredFRTimeline()
+	
+	SetDataFolder root:Timeline
+	Wave/T ARName
+	Wave ARTime, ARState,ARStartTime,AREndTime,ARErrorBar
+	Make/D/O/N=1 CenteredRampTime, CenteredRampState,CenteredRampStartTime,CenteredRampEndTime,CenteredRampErrorBar
+	Make/O/T/N=1 CenteredRampName
+	Variable NumRamps=DimSize(ARStartTime,0)
+	Variable RampCounter=0
+	For(RampCounter=0;RampCounter<NumRamps;RampCounter+=1)
+		If(StringMatch(ARName[RampCounter],"*CFR*"))
+			Variable NumCenteredRamps=DimSize(CenteredRampTime,0)
+			InsertPoints NumCenteredRamps, 1, CenteredRampTime, CenteredRampState,CenteredRampStartTime,CenteredRampEndTime,CenteredRampErrorBar,CenteredRampName
+			CenteredRampName[NumCenteredRamps]=ARName[RampCounter]
+			CenteredRampTime[NumCenteredRamps]=ARTime[RampCounter]
+			CenteredRampState[NumCenteredRamps]=ARState[RampCounter]
+			CenteredRampStartTime[NumCenteredRamps]=ARStartTime[RampCounter]
+			CenteredRampEndTime[NumCenteredRamps]=AREndTime[RampCounter]
+			CenteredRampErrorBar[NumCenteredRamps]=ARErrorBar[RampCounter]
+			SetDimLabel 0,NumCenteredRamps,$CenteredRampName[NumCenteredRamps],CenteredRampName,CenteredRampTime,CenteredRampState,CenteredRampStartTime,CenteredRampEndTime,CenteredRampErrorBar
+
+		EndIf
+	EndFor
+	DeletePoints 0, 1, CenteredRampTime, CenteredRampState,CenteredRampStartTime,CenteredRampEndTime,CenteredRampErrorBar,CenteredRampName
 End
 
 Function GetUserMeasurementTimeLine(TargetDataFolder,WavePrefix,TimelineName)
@@ -85,25 +112,20 @@ Function GetUserMeasurementTimeLine(TargetDataFolder,WavePrefix,TimelineName)
 		MiddleTime[WaveCounter]=(EndTime[WaveCounter]+StartTime[WaveCounter])/2
 		ErrorBar[WaveCounter]=(EndTime[WaveCounter]-StartTime[WaveCounter])/2
 		Name[WaveCounter]=TimelineName+num2str(WaveCounter)
+		SetDimLabel 0,WaveCounter,$Name[WaveCounter],StartTime,MiddleTime,ErrorBar,Name,EndTime
+		
 	EndFor
-	Sort EndTime,EndTime,MiddleTime,StartTime,Name,ErrorBar
+	Sort/DIML EndTime,EndTime,MiddleTime,StartTime,Name,ErrorBar
 End
 
-// Just doing this for RNA right now.
 Function/S NearestARForceRamp(Name)
 	String Name
 	SetDataFolder root:Timeline	
 	Wave ARTime, ARState,ARStartTime,AREndTime,ARErrorBar,MasterTime
 	Wave/T MasterNames,ARName
-	Variable NumMaster=DimSize(MasterNames,0)
-	Variable MasterCounter=0
-	Variable TargetTime=NaN, MasterIndex=NaN
-	For(MasterCounter=0;MasterCounter<NumMaster;MasterCounter+=1)
-		If(StringMatch(Name,MasterNames[MasterCounter]))
-			TargetTime=MasterTime[MasterCounter]
-			MasterIndex=MasterCounter
-		EndIF
-	EndFor
+
+	Variable MasterIndex=FindDimLabel(MasterNames, 0, Name )
+	Variable TargetTime=MasterTime[MasterIndex]
 	
 	FindLevel/P/Q ARTime, TargetTime
 	Variable RampEndBeforeIndex=Floor(V_LevelX)
@@ -120,3 +142,41 @@ Function/S NearestARForceRamp(Name)
  	EndIf
 	
 End
+
+// Just doing this for RNA right now.
+Function/S PreviousCenteredForceRamp(Name)
+	String Name
+	SetDataFolder root:Timeline	
+	Wave MasterTime,CenteredRampTime
+	Wave/T MasterNames,CenteredRampName
+
+	Variable MasterIndex=FindDimLabel(MasterNames, 0, Name )
+	Variable TargetTime=MasterTime[MasterIndex]
+	Variable NumCFR=DimSize(CenteredRampTime,0)
+	
+	
+	FindLevel/T=0.01/EDGE=1/P/Q CenteredRampTime, TargetTime
+	
+	Variable CFRTime=V_LevelX
+	Variable CFRIndex=Floor(V_LevelX)
+
+ 	If(!V_flag)
+ 		Return CenteredRampName[CFRIndex]
+ 	Else
+ 		If(TargetTime>CenteredRampTime[NumCFR-1])
+ 			Return CenteredRampName[NumCFR-1]
+ 		Else
+ 			Return "No Centered Ramp Before This"
+ 		EndIf
+ 	EndIf
+End
+
+Function TimeSincePreviousCFR(Name)
+	String Name
+	SetDataFolder root:Timeline	
+	Wave CenteredRampEndTime,MasterTime
+	Return MasterTime[%$Name]-CenteredRampEndTime[%$PreviousCenteredForceRamp(Name)]
+
+End
+
+
