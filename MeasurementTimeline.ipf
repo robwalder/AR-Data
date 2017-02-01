@@ -104,6 +104,8 @@ Function GetUserMeasurementTimeLine(TargetDataFolder,WavePrefix,TimelineName)
 	
 	For(WaveCounter=0;WaveCounter<NumWaves;WaveCounter+=1)
 		Wave TargetWave=$StringFromList(WaveCounter,TargetWaveNames,";")
+		Variable MeasurementIndex=WaveCounter
+		sscanf StringFromList(WaveCounter,TargetWaveNames,";"), WavePrefix+"%f", MeasurementIndex
 		EndTime[WaveCounter]=GetAbsoluteTimeWN(TargetWave)
 		Variable NumPts=DimSize(TargetWave,0)
 		Variable TimeForMeasurement=pnt2x(TargetWave, NumPts-1 )
@@ -111,7 +113,7 @@ Function GetUserMeasurementTimeLine(TargetDataFolder,WavePrefix,TimelineName)
 		StartTime[WaveCounter]=EndTime[WaveCounter]-TimeForMeasurement
 		MiddleTime[WaveCounter]=(EndTime[WaveCounter]+StartTime[WaveCounter])/2
 		ErrorBar[WaveCounter]=(EndTime[WaveCounter]-StartTime[WaveCounter])/2
-		Name[WaveCounter]=TimelineName+num2str(WaveCounter)
+		Name[WaveCounter]=TimelineName+num2str(MeasurementIndex)
 		SetDimLabel 0,WaveCounter,$Name[WaveCounter],StartTime,MiddleTime,ErrorBar,Name,EndTime
 		
 	EndFor
