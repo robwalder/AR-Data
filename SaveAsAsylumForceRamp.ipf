@@ -129,9 +129,18 @@ function DE_SaveFC(DefVolts,ZSensorVolts,TriggerInfo,[AdditionalNote])
 	// I tracked down the issues with a back "X" index in saving in the asylum format to this section of code
 	// basically, if you use the molecule trigger, it will return a value of over 400000 if you didn't get a molecule
 	// this then gets put in this giant number over 400,000 as a index for splitting the wave up.  This just prevents that from happening
-
+	// Note from Rob on 06/22/2017
+	// I had another issue pop up with a bad "x" index.  For some reason, the old way of estimating the index from trigger 2 was giving indices bigger
+	// than the size of the wave.  This was freezing up the program from time to time.  I updated the code below to make sure that can't happen.
 	If (ramp2pts<400000)
-		Index += ramp2pts
+		Variable EstimatedRampTrigger=Index + ramp2pts
+		Variable EndIndex=dimsize(Def_save,0)-1
+		If(EstimatedRampTrigger>EndIndex)
+				Index = EndIndex
+		Else 
+			Index =EstimatedRampTrigger
+		EndIf
+		
 		Indexes += num2istr(Index)+","
 		Directions += num2str(-1)+","
 	EndIf
@@ -139,6 +148,7 @@ function DE_SaveFC(DefVolts,ZSensorVolts,TriggerInfo,[AdditionalNote])
 	//This just lists the rest of the wave (from where the trigger fired through to the end of the wave) as a dwell. In general, this isn't a true dwell, but
 	//rather the time it takes to interact with Igor, decide whether we found a molecule, and then do whatever else it is we want to do (for instance,
 	//ramp toward the surface etc.
+	
 	
 	Index=dimsize(Def_save,0)-1
 	Indexes += num2istr(Index)
